@@ -25,3 +25,17 @@ def test_main(tmp_path, capsys):
     path.write_text("Иванов\n    математика:80\n", encoding="utf-8")
     main(["-p", str(path)])
     assert "Иванов: 80.00" in capsys.readouterr().out
+
+
+def test_main_xml(tmp_path, capsys):
+    path = tmp_path / "students.XML"
+    path.write_text('<students><student name="Иванов">'
+                    '<subject name="физика">90</subject>'
+                    '</student></students>', encoding="utf-8")
+    main(["-p", str(path)])
+    assert "Иванов: 90.00" in capsys.readouterr().out
+
+
+def test_unknown_format():
+    with pytest.raises(ValueError, match="TXT и XML"):
+        main(["-p", "data.json"])
