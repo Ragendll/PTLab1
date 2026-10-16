@@ -39,3 +39,28 @@ def test_main_xml(tmp_path, capsys):
 def test_unknown_format():
     with pytest.raises(ValueError, match="TXT и XML"):
         main(["-p", "data.json"])
+
+
+@pytest.mark.parametrize("extension", ["txt", "xml"])
+def test_first_quartile_output(tmp_path, capsys, extension):
+    path = tmp_path / f"students.{extension}"
+    if extension == "txt":
+        text = "Иванов\n    физика:60\nПетров\n    физика:90\n"
+    else:
+        text = ('<students><student name="Иванов">'
+                '<subject name="физика">60</subject></student>'
+                '<student name="Петров">'
+                '<subject name="физика">90</subject></student></students>')
+    path.write_text(text, encoding="utf-8")
+    main(["-p", str(path)])
+    output = capsys.readouterr().out
+    quartile_output = output.split("Студенты первой квартили:")[1]
+    assert "Иванов: 60.00" in quartile_output
+    assert "Петров" not in quartile_output
+
+
+def test_main_empty_data(tmp_path, capsys):
+    path = tmp_path / "empty.xml"
+    path.write_text("<students/>", encoding="utf-8")
+    main(["-p", str(path)])
+    assert "Нет данных о студентах" in capsys.readouterr().out
