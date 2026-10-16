@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 
 from src.CalcRating import CalcRating
+from src.FirstQuartile import FirstQuartile
 from src.TextDataReader import TextDataReader
 from src.XmlDataReader import XmlDataReader
 
@@ -29,6 +30,13 @@ def main(args: list[str] | None = None) -> None:
     rating = CalcRating(students).calc()
     print("Рейтинг студентов:")
     for name, score in rating.items():
+        print(f"{name}: {score:.2f}")
+
+    first_quartile = FirstQuartile(rating).calc()
+    print("\nСтуденты первой квартили:")
+    if not first_quartile:
+        print("Нет данных о студентах")
+    for name, score in first_quartile.items():
         print(f"{name}: {score:.2f}")
 
 
